@@ -1,5 +1,9 @@
-var express=require('express')
+const express=require('express')
 const app=express();
+
+//Connecting server file for AWT
+let server = require('./server');
+let middleware = require('./middleware');
 //body parser
 const bodyParser=require('body-parser');
 app.use(bodyParser.urlencoded({extended:true}));
@@ -7,9 +11,7 @@ app.use(bodyParser.json());
 //for mongodb
 const MongoClient=require('mongodb').MongoClient;
 //const MongClient=require('./server');
-let server=require('./server');
-//let config=require('./config');
-let middleware=require('./middleware');
+
 //const response=require('express');
 //const { homedir } = require('os');
 //const { readdirSync } = require('fs');
@@ -19,9 +21,9 @@ const dbname= 'hospital';
 let db
 MongoClient.connect(url, { useUnifiedTopology: true },(err, client) => {
   if (err) return console.log(err);
-  db=client.db(dbName);
-  console.log(`connected MongoDB :${url}`);
-  console.log(`Database:${dbName}`);
+  db=client.db(dbname);
+  console.log(`connected Database :${url}`);
+  console.log(`Database:${dbname}`);
    
 })
 //fetching hospital details
@@ -33,7 +35,7 @@ app.get('/hospitaldetails',middleware.checkToken,function(req,res){
 });
 
 //ventilator details
-app.get('/hospitaldetails',middleware.checkToken,(req,res) => {
+app.get('/ventilators',middleware.checkToken,(req,res) => {
     console.log("ventilators information");
     var ventilatordetails =db.collection('ventilators').find().toArray()
         .then(result=> res.json(result));
@@ -89,16 +91,16 @@ app.put('/updateventilator',middleware.checkToken,(req,res)=>{
     });
     });
 //delete ventilator by ventilatorid
-app.delete('/delete',middleware.checkToken,(req,res)=>{
+app.delete('/deleteventbyid',middleware.checkToken,(req,res)=>{
     var myquery=req.query.ventilatorid;
     console.log(myquery);
     var myquery1={ventilatorid:myquery};
     db.collection('ventilators').deleteOne(myquery1,function(err,obj)
     {
         if(err) throw err;
-        res.json("1 documeny deleted");
+        res.json("1 document deleted");
         });
 
 });
 
-app.listen(700)
+app.listen(1100)
